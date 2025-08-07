@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Search{% if query %} - {{ query }}{% endif %} - X Clone{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Search Results</h2>
+        
+        {% if query %}
+            <p class="text-muted">Results for "{{ query }}"</p>
+            
+            <!-- Users -->
+            {% if users %}
+                <h4>People</h4>
+                {% for user in users %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ user.avatar.url }}" alt="Avatar" class="user-avatar me-3">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ user.get_full_name|default:user.username }}</h6>
+                                    <p class="text-muted mb-1">@{{ user.username }}</p>
+                                    {% if user.bio %}
+                                        <p class="mb-0">{{ user.bio|truncatewords:20 }}</p>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <a href="{% url 'profile' user.username %}" class="btn btn-outline-primary btn-sm">View Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Hashtags -->
+            {% if hashtags %}
+                <h4>Hashtags</h4>
+                {% for hashtag in hashtags %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">#{{ hashtag.name }}</h6>
+                                    <p class="text-muted mb-0">{{ hashtag.posts_count }} post{{ hashtag.posts_count|pluralize }}</p>
+                                </div>
+                                <div>
+                                    <a href="{% url 'hashtag' hashtag.name %}" class="btn btn-outline-primary btn-sm">View Posts</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <!-- Posts -->
+            {% if posts %}
+                <h4>Posts</h4>
+                {% for post in posts %}
+                    <div class="post-card">
+                        <div class="d-flex">
+                            <img src="{{ post.author.avatar.url }}" alt="Avatar" class="user-avatar me-3">
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                                    <span class="text-muted ms-2">@{{ post.author.username }}</span>
+                                    <span class="text-muted ms-2">·</span>
+                                    <span class="text-muted ms-2">{{ post.created_at|timesince }} ago</span>
+                                </div>
+                                
+                                <p class="mb-2">{{ post.content|linebreaks }}</p>
+                                
+                                {% if post.image %}
+                                    <img src="{{ post.image.url }}" alt="Post image" class="img-fluid rounded mb-2" style="max-height: 400px;">
+                                {% endif %}
+                                
+                                <div class="post-actions">
+                                    <button class="post-action-btn" onclick="window.location.href='{% url 'post_detail' post.pk %}'">
+                                        <i class="far fa-comment"></i> {{ post.replies_count }}
+                                    </button>
+                                    
+                                    {% if user.is_authenticated %}
+                                        <button class="post-action-btn retweet-btn {% if user in post.retweets.all %}retweeted{% endif %}" 
+                                                data-post-id="{{ post.pk }}" onclick="toggleRetweet({{ post.pk }})">
+                                            <i class="fas fa-retweet"></i> 
+                                            <span class="retweet-count" data-post-id="{{ post.pk }}">{{ post.retweets_count }}</span>
+                                        </button>
+                                        
+                                        <button class="post-action-btn like-btn {% if user in post.likes.all %}liked{% endif %}" 
+                                                data-post-id="{{ post.pk }}" onclick="toggleLike({{ post.pk }})">
+                                            <i class="{% if user in post.likes.all %}fas{% else %}far{% endif %} fa-heart"></i> 
+                                            <span class="like-count" data-post-id="{{ post.pk }}">{{ post.likes_count }}</span>
+                                        </button>
+                                    {% else %}
+                                        <span class="post-action-btn">
+                                            <i class="fas fa-retweet"></i> {{ post.retweets_count }}
+                                        </span>
+                                        <span class="post-action-btn">
+                                            <i class="far fa-heart"></i> {{ post.likes_count }}
+                                        </span>
+                                    {% endif %}
+                                    
+                                    <button class="post-action-btn">
+                                        <i class="far fa-share"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% if not users and not hashtags and not posts %}
+                <div class="text-center py-5">
+                    <h4>No results found</h4>
+                    <p>Try searching for something else.</p>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <h4>Search X Clone</h4>
+                <p>Find people, posts, and hashtags.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

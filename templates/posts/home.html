@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - X Clone{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Home</h2>
+        
+        {% if user.is_authenticated %}
+            <!-- Post Creation Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="d-flex">
+                            <img src="{{ user.avatar.url }}" alt="Avatar" class="user-avatar me-3">
+                            <div class="flex-grow-1">
+                                {{ form.content }}
+                                <div class="character-count mt-2">280 characters remaining</div>
+                                <div class="mt-2">
+                                    {{ form.image }}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div></div>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4">Post</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Posts Feed -->
+        {% for post in page_obj %}
+            <div class="post-card">
+                <div class="d-flex">
+                    <img src="{{ post.author.avatar.url }}" alt="Avatar" class="user-avatar me-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-2">
+                            <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                            <span class="text-muted ms-2">@{{ post.author.username }}</span>
+                            <span class="text-muted ms-2">·</span>
+                            <span class="text-muted ms-2">{{ post.created_at|timesince }} ago</span>
+                        </div>
+                        
+                        <p class="mb-2">{{ post.content|linebreaks }}</p>
+                        
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="Post image" class="img-fluid rounded mb-2" style="max-height: 400px;">
+                        {% endif %}
+                        
+                        <div class="post-actions">
+                            <button class="post-action-btn" onclick="window.location.href='{% url 'post_detail' post.pk %}'">
+                                <i class="far fa-comment"></i> {{ post.replies_count }}
+                            </button>
+                            
+                            {% if user.is_authenticated %}
+                                <button class="post-action-btn retweet-btn {% if user in post.retweets.all %}retweeted{% endif %}" 
+                                        data-post-id="{{ post.pk }}" onclick="toggleRetweet({{ post.pk }})">
+                                    <i class="fas fa-retweet"></i> 
+                                    <span class="retweet-count" data-post-id="{{ post.pk }}">{{ post.retweets_count }}</span>
+                                </button>
+                                
+                                <button class="post-action-btn like-btn {% if user in post.likes.all %}liked{% endif %}" 
+                                        data-post-id="{{ post.pk }}" onclick="toggleLike({{ post.pk }})">
+                                    <i class="{% if user in post.likes.all %}fas{% else %}far{% endif %} fa-heart"></i> 
+                                    <span class="like-count" data-post-id="{{ post.pk }}">{{ post.likes_count }}</span>
+                                </button>
+                            {% else %}
+                                <span class="post-action-btn">
+                                    <i class="fas fa-retweet"></i> {{ post.retweets_count }}
+                                </span>
+                                <span class="post-action-btn">
+                                    <i class="far fa-heart"></i> {{ post.likes_count }}
+                                </span>
+                            {% endif %}
+                            
+                            <button class="post-action-btn">
+                                <i class="far fa-share"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-5">
+                <h4>No posts yet!</h4>
+                {% if user.is_authenticated %}
+                    <p>Start following people or create your first post.</p>
+                {% else %}
+                    <p><a href="{% url 'register' %}">Join X Clone</a> to see posts from the community.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+            <nav aria-label="Posts pagination">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

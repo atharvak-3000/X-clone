@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}X Clone{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Light mode colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e1e8ed;
+            --text-primary: #14171a;
+            --text-secondary: #657786;
+            --text-muted: #aab8c2;
+            --border-color: #e1e8ed;
+            --card-bg: #ffffff;
+            --navbar-bg: #ffffff;
+            --sidebar-bg: #f8f9fa;
+            --hover-bg: #f7f9fa;
+            --brand-color: #1da1f2;
+            --like-color: #e0245e;
+            --retweet-color: #17bf63;
+            --warning-color: #ffad1f;
+        }
+
+        [data-theme="dark"] {
+            /* Dark mode colors */
+            --bg-primary: #15202b;
+            --bg-secondary: #192734;
+            --bg-tertiary: #22303c;
+            --text-primary: #ffffff;
+            --text-secondary: #8899a6;
+            --text-muted: #6b7280;
+            --border-color: #38444d;
+            --card-bg: #192734;
+            --navbar-bg: #15202b;
+            --sidebar-bg: #192734;
+            --hover-bg: #1e2732;
+            --brand-color: #1da1f2;
+            --like-color: #f91880;
+            --retweet-color: #00ba7c;
+            --warning-color: #ffad1f;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar {
+            background-color: var(--navbar-bg) !important;
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            color: var(--brand-color) !important;
+        }
+
+        .nav-link {
+            color: var(--text-primary) !important;
+        }
+
+        .nav-link:hover {
+            color: var(--brand-color) !important;
+        }
+
+        .post-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .post-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+
+        .post-action-btn:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .post-action-btn.liked {
+            color: var(--like-color);
+        }
+
+        .post-action-btn.retweeted {
+            color: var(--retweet-color);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            min-height: calc(100vh - 56px);
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .trending-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .character-count {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .character-count.warning {
+            color: var(--warning-color);
+        }
+
+        .character-count.danger {
+            color: var(--like-color);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .card-header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-control {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .form-control:focus {
+            background-color: var(--card-bg);
+            border-color: var(--brand-color);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+        }
+
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        .border-bottom {
+            border-bottom: 1px solid var(--border-color) !important;
+        }
+
+        .alert {
+            border: 1px solid var(--border-color);
+        }
+
+        .pagination .page-link {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .pagination .page-link:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--brand-color);
+            color: var(--brand-color);
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: var(--brand-color);
+            border-color: var(--brand-color);
+        }
+
+        .dark-mode-toggle {
+            background: none;
+            border: 2px solid transparent;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--brand-color);
+            transform: scale(1.1);
+        }
+
+        .dark-mode-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .dropdown-menu {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .dropdown-item {
+            color: var(--text-primary);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Additional dark mode styles */
+        .btn-primary {
+            background-color: var(--brand-color);
+            border-color: var(--brand-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #1991db;
+            border-color: #1991db;
+        }
+
+        .btn-outline-primary {
+            color: var(--brand-color);
+            border-color: var(--brand-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--brand-color);
+            border-color: var(--brand-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--text-secondary);
+            border-color: var(--text-secondary);
+        }
+
+        .btn-outline-secondary {
+            color: var(--text-secondary);
+            border-color: var(--text-secondary);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+        }
+
+        .img-thumbnail {
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+        }
+
+        /* Smooth transitions for theme switching */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Override Bootstrap's default colors for dark mode */
+        [data-theme="dark"] .text-dark {
+            color: var(--text-primary) !important;
+        }
+
+        [data-theme="dark"] .bg-light {
+            background-color: var(--bg-secondary) !important;
+        }
+
+        [data-theme="dark"] .bg-white {
+            background-color: var(--card-bg) !important;
+        }
+
+        [data-theme="dark"] .border {
+            border-color: var(--border-color) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fab fa-twitter"></i> X Clone
+            </a>
+            
+            <div class="navbar-nav ms-auto d-flex align-items-center">
+                {% if user.is_authenticated %}
+                    <form class="d-flex me-3" method="GET" action="{% url 'search' %}">
+                        <input class="form-control" type="search" name="q" placeholder="Search..." value="{{ request.GET.q }}">
+                        <button class="btn btn-outline-primary ms-2" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+                {% endif %}
+
+                <!-- Dark Mode Toggle -->
+                <button class="dark-mode-toggle me-3" onclick="toggleDarkMode()" title="Toggle dark mode">
+                    <i class="fas fa-moon" id="dark-mode-icon"></i>
+                </button>
+
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'profile' user.username %}">
+                        <img src="{{ user.avatar.url }}" alt="Avatar" class="user-avatar me-2">
+                        {{ user.username }}
+                    </a>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-8">
+                {% block content %}
+                {% endblock %}
+            </div>
+            
+            <div class="col-md-4">
+                <div class="sidebar">
+                    {% if user.is_authenticated %}
+                        <div class="card mb-3">
+                            <div class="card-body text-center">
+                                <img src="{{ user.avatar.url }}" alt="Avatar" class="user-avatar mb-2">
+                                <h6>{{ user.get_full_name|default:user.username }}</h6>
+                                <p class="text-muted">@{{ user.username }}</p>
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <strong>{{ user.posts.count }}</strong><br>
+                                        <small>Posts</small>
+                                    </div>
+                                    <div class="col">
+                                        <strong>{{ user.following_count }}</strong><br>
+                                        <small>Following</small>
+                                    </div>
+                                    <div class="col">
+                                        <strong>{{ user.followers_count }}</strong><br>
+                                        <small>Followers</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h6>What's happening</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="trending-item">
+                                <small class="text-muted">Trending in Technology</small><br>
+                                <strong>#Django</strong>
+                            </div>
+                            <div class="trending-item">
+                                <small class="text-muted">Trending</small><br>
+                                <strong>#WebDevelopment</strong>
+                            </div>
+                            <div class="trending-item">
+                                <small class="text-muted">Trending</small><br>
+                                <strong>#Python</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // Dark Mode Functionality
+        function toggleDarkMode() {
+            const body = document.body;
+            const icon = document.getElementById('dark-mode-icon');
+
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                icon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize theme on page load
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const icon = document.getElementById('dark-mode-icon');
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.body.setAttribute('data-theme', 'dark');
+                if (icon) icon.className = 'fas fa-sun';
+            } else {
+                document.body.removeAttribute('data-theme');
+                if (icon) icon.className = 'fas fa-moon';
+            }
+        }
+
+        // Initialize theme immediately
+        initializeTheme();
+
+        // Character counter for post content
+        $(document).ready(function() {
+            // Re-initialize theme after jQuery is loaded
+            initializeTheme();
+
+            $('textarea[name="content"]').on('input', function() {
+                const maxLength = 280;
+                const currentLength = $(this).val().length;
+                const remaining = maxLength - currentLength;
+
+                let counterClass = 'character-count';
+                if (remaining < 20) counterClass += ' warning';
+                if (remaining < 0) counterClass += ' danger';
+
+                $('.character-count').removeClass('character-count warning danger').addClass(counterClass);
+                $('.character-count').text(remaining + ' characters remaining');
+            });
+        });
+
+        // AJAX for like/retweet functionality
+        function toggleLike(postId) {
+            $.post(`/like/${postId}/`, {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }, function(data) {
+                const likeBtn = $(`.like-btn[data-post-id="${postId}"]`);
+                const likeCount = $(`.like-count[data-post-id="${postId}"]`);
+                
+                if (data.liked) {
+                    likeBtn.addClass('liked');
+                    likeBtn.find('i').removeClass('far').addClass('fas');
+                } else {
+                    likeBtn.removeClass('liked');
+                    likeBtn.find('i').removeClass('fas').addClass('far');
+                }
+                likeCount.text(data.likes_count);
+            });
+        }
+
+        function toggleRetweet(postId) {
+            $.post(`/retweet/${postId}/`, {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }, function(data) {
+                const retweetBtn = $(`.retweet-btn[data-post-id="${postId}"]`);
+                const retweetCount = $(`.retweet-count[data-post-id="${postId}"]`);
+                
+                if (data.retweeted) {
+                    retweetBtn.addClass('retweeted');
+                } else {
+                    retweetBtn.removeClass('retweeted');
+                }
+                retweetCount.text(data.retweets_count);
+            });
+        }
+
+        function toggleFollow(username) {
+            $.post(`/accounts/follow/${username}/`, {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            }, function(data) {
+                const followBtn = $(`.follow-btn[data-username="${username}"]`);
+                const followersCount = $(`.followers-count[data-username="${username}"]`);
+                
+                if (data.is_following) {
+                    followBtn.text('Unfollow').removeClass('btn-primary').addClass('btn-outline-primary');
+                } else {
+                    followBtn.text('Follow').removeClass('btn-outline-primary').addClass('btn-primary');
+                }
+                followersCount.text(data.followers_count);
+            });
+        }
+    </script>
+    
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>
