@@ -1,4 +1,4 @@
-# X Clone - Twitter-like Social Media Platform
+# X Clone - Twitter-like Social Media Platform (Made With Augment Code)
 
 A full-featured social media platform inspired by X.com (formerly Twitter), built with Django and modern web technologies. This project demonstrates comprehensive full-stack development skills and modern web application architecture.
 
