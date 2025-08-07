@@ -35,7 +35,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+# Create staticfiles directory if it doesn't exist
+os.makedirs(STATIC_ROOT, exist_ok=True)
 
 # Middleware
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
@@ -43,6 +46,11 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 # Media files for production
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Create media directories if they don't exist
+os.makedirs(os.path.join(MEDIA_ROOT, 'avatars'), exist_ok=True)
+os.makedirs(os.path.join(MEDIA_ROOT, 'covers'), exist_ok=True)
+os.makedirs(os.path.join(MEDIA_ROOT, 'post_images'), exist_ok=True)
 
 # Email settings (optional)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
