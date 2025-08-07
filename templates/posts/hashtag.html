@@ -1,38 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - X Clone{% endblock %}
+{% block title %}#{{ hashtag.name }} - X Clone{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <h2>Home</h2>
+        <h2>#{{ hashtag.name }}</h2>
+        <p class="text-muted">{{ hashtag.posts_count }} post{{ hashtag.posts_count|pluralize }}</p>
         
-        {% if user.is_authenticated %}
-            <!-- Post Creation Form -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <form method="post" action="{% url 'create_post' %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <div class="d-flex">
-                            <img src="{{ user.get_avatar_url }}" alt="Avatar" class="user-avatar me-3">
-                            <div class="flex-grow-1">
-                                {{ form.content }}
-                                <div class="character-count mt-2">280 characters remaining</div>
-                                <div class="mt-2">
-                                    {{ form.image }}
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <div></div>
-                                    <button type="submit" class="btn btn-primary rounded-pill px-4">Post</button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        {% endif %}
-
-        <!-- Posts Feed -->
+        <!-- Posts with this hashtag -->
         {% for post in page_obj %}
             <div class="post-card">
                 <div class="d-flex">
@@ -86,12 +62,8 @@
             </div>
         {% empty %}
             <div class="text-center py-5">
-                <h4>No posts yet!</h4>
-                {% if user.is_authenticated %}
-                    <p>Start following people or create your first post.</p>
-                {% else %}
-                    <p><a href="{% url 'register' %}">Join X Clone</a> to see posts from the community.</p>
-                {% endif %}
+                <h4>No posts found</h4>
+                <p>No posts with this hashtag yet.</p>
             </div>
         {% endfor %}
 

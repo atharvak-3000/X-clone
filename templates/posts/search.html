@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load avatar_tags %}
 
 {% block title %}Search{% if query %} - {{ query }}{% endif %} - X Clone{% endblock %}
 
@@ -18,7 +17,7 @@
                     <div class="card mb-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
-                                <img src="{{ user|avatar_url }}" alt="Avatar" class="user-avatar me-3">
+                                <img src="{{ user.get_avatar_url }}" alt="Avatar" class="user-avatar me-3">
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{ user.get_full_name|default:user.username }}</h6>
                                     <p class="text-muted mb-1">@{{ user.username }}</p>
@@ -61,7 +60,7 @@
                 {% for post in posts %}
                     <div class="post-card">
                         <div class="d-flex">
-                            <img src="{{ post.author|avatar_url }}" alt="Avatar" class="user-avatar me-3">
+                            <img src="{{ post.author.get_avatar_url }}" alt="Avatar" class="user-avatar me-3">
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center mb-2">
                                     <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>

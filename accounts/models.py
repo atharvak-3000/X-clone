@@ -40,3 +40,25 @@ class User(AbstractUser):
 
     def is_following(self, user):
         return self.following.filter(id=user.id).exists()
+
+    def get_avatar_url(self):
+        """Return user avatar URL or default avatar URL if file doesn't exist"""
+        if self.avatar and hasattr(self.avatar, 'url'):
+            try:
+                # Try to access the URL - if file exists, this will work
+                return self.avatar.url
+            except:
+                pass
+
+        # Return a default avatar URL using a placeholder service
+        name = self.get_full_name() or self.username
+        return f"https://ui-avatars.com/api/?name={name}&background=1da1f2&color=fff&size=300"
+
+    def get_cover_url(self):
+        """Return user cover photo URL or None if file doesn't exist"""
+        if self.cover_photo and hasattr(self.cover_photo, 'url'):
+            try:
+                return self.cover_photo.url
+            except:
+                pass
+        return None

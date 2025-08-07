@@ -4,7 +4,7 @@ from .settings import *
 
 # Production settings
 DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,*.railway.app').split(',')
 
 # Database
 if config('USE_SQLITE', default=False, cast=bool):

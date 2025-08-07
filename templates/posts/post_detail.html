@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Post by {{ post.author.username }} - X Clone{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="post-card">
+            <div class="d-flex">
+                <img src="{{ post.author.get_avatar_url }}" alt="Avatar" class="user-avatar me-3">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-2">
+                        <strong>{{ post.author.get_full_name|default:post.author.username }}</strong>
+                        <span class="text-muted ms-2">@{{ post.author.username }}</span>
+                        <span class="text-muted ms-2">·</span>
+                        <span class="text-muted ms-2">{{ post.created_at|timesince }} ago</span>
+                    </div>
+                    
+                    <p class="mb-2">{{ post.content|linebreaks }}</p>
+                    
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="Post image" class="img-fluid rounded mb-2" style="max-height: 400px;">
+                    {% endif %}
+                    
+                    <div class="post-actions">
+                        <span class="post-action-btn">
+                            <i class="far fa-comment"></i> {{ post.replies_count }}
+                        </span>
+                        
+                        {% if user.is_authenticated %}
+                            <button class="post-action-btn retweet-btn {% if user in post.retweets.all %}retweeted{% endif %}" 
+                                    data-post-id="{{ post.pk }}" onclick="toggleRetweet({{ post.pk }})">
+                                <i class="fas fa-retweet"></i> 
+                                <span class="retweet-count" data-post-id="{{ post.pk }}">{{ post.retweets_count }}</span>
+                            </button>
+                            
+                            <button class="post-action-btn like-btn {% if user in post.likes.all %}liked{% endif %}" 
+                                    data-post-id="{{ post.pk }}" onclick="toggleLike({{ post.pk }})">
+                                <i class="{% if user in post.likes.all %}fas{% else %}far{% endif %} fa-heart"></i> 
+                                <span class="like-count" data-post-id="{{ post.pk }}">{{ post.likes_count }}</span>
+                            </button>
+                        {% else %}
+                            <span class="post-action-btn">
+                                <i class="fas fa-retweet"></i> {{ post.retweets_count }}
+                            </span>
+                            <span class="post-action-btn">
+                                <i class="far fa-heart"></i> {{ post.likes_count }}
+                            </span>
+                        {% endif %}
+                        
+                        <button class="post-action-btn">
+                            <i class="far fa-share"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Replies -->
+        <h4>Replies</h4>
+        {% for reply in replies %}
+            <div class="post-card">
+                <div class="d-flex">
+                    <img src="{{ reply.author.get_avatar_url }}" alt="Avatar" class="user-avatar me-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-2">
+                            <strong>{{ reply.author.get_full_name|default:reply.author.username }}</strong>
+                            <span class="text-muted ms-2">@{{ reply.author.username }}</span>
+                            <span class="text-muted ms-2">·</span>
+                            <span class="text-muted ms-2">{{ reply.created_at|timesince }} ago</span>
+                        </div>
+                        
+                        <p class="mb-2">{{ reply.content|linebreaks }}</p>
+                        
+                        {% if reply.image %}
+                            <img src="{{ reply.image.url }}" alt="Reply image" class="img-fluid rounded mb-2" style="max-height: 400px;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="text-center py-3">
+                <p class="text-muted">No replies yet.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
